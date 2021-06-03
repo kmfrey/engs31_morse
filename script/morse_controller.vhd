@@ -51,8 +51,8 @@ signal assign_output, clear_output : STD_LOGIC := '0';
 signal output_bits : STD_LOGIC_VECTOR(1 downto 0) := "00"; -- assigned during read phase
 
 -- for timing
-constant counter_time : integer := 5e6; -- creates a dot-time of 0.5seconds
-signal timer_counter : unsigned(26 downto 0) := (others => '0');
+constant counter_time : integer := 5e6; -- 2Hz "clock", since clk is 10MHZ. 0.5s for each dot-time
+signal timer_counter : unsigned(22 downto 0) := (others => '0');
 signal timer_tc : STD_LOGIC := '0';
 
 -- for state control
@@ -71,7 +71,7 @@ begin
 
     if rising_edge(clk) then
         cs <= ns;
-        -- debounce & monopulse if needed
+        -- debounce & monopulse 
         if queue_sent = '1' then
             new_data <= '0'; -- default
             if queue_wait = 0 then
