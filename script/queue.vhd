@@ -38,7 +38,7 @@ begin
             end if;
         end if;
         
-        if (read = '1') and (not (W_ADDR = R_ADDR)) then -- Only update r_addr counter when output_data signal is asserted and queue is not empty
+        if (read = '1') and (not (W_ADDR = R_ADDR)) then -- Only update r_addr counter when read signal is asserted and queue is not empty
         	Queue_reg(R_ADDR) <= (others => '0');
         	if R_ADDR = (queue_size-1) then   --- R_ADDR Counter
             	R_ADDR <= 0;
@@ -62,7 +62,7 @@ if (W_ADDR = R_ADDR) then
 end process;
 
 process(R_ADDR, W_ADDR, q_empty, read) -- Output Update
--- Outputs 0s If queue is empty read signal not asserted, 
+-- Outputs 0s If queue is empty and read signal not asserted, 
 begin
 if (read = '1') and (not (W_ADDR = R_ADDR)) then
 	Data_out <= Queue_reg(R_ADDR);
