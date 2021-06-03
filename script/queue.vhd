@@ -62,13 +62,11 @@ if (W_ADDR = R_ADDR) then
 end process;
 
 process(R_ADDR, W_ADDR, q_empty, read) -- Output Update
--- Outputs 0s If queue is empty and read signal not asserted, 
+-- Keeps the previous data_out bits, If queue is empty and read signal not asserted
 begin
 if (read = '1') and (not (W_ADDR = R_ADDR)) then
 	Data_out <= Queue_reg(R_ADDR);
 
-else 
-	Data_out <= (others => '0');
 end if;
 
 end process;
