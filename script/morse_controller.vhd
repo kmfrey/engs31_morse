@@ -190,6 +190,7 @@ begin
                 end if;
             elsif pause_count = '1' then
              -- take into account the 2 clk cycle delay, so do 2 cycles instead of 3
+                counter <= counter + 1;
                 if counter = "010" then
                     tc <= '1';
                     counter <= "000";
