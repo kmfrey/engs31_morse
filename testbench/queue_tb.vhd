@@ -13,6 +13,7 @@ PORT ( 	clk		:	in	STD_LOGIC; --10 MHz clock
 		read	: 	in 	STD_LOGIC;
         Data_in	:	in	STD_LOGIC_VECTOR(7 downto 0);
 		Data_out:	out	STD_LOGIC_VECTOR(7 downto 0);
+		data_sent:  out STD_LOGIC;
         data_present : out STD_LOGIC );
 end component;
 
@@ -22,6 +23,7 @@ signal 	Read	: 	STD_LOGIC	:= '0';
 signal 	Data_in	:	STD_LOGIC_Vector(7 downto 0) := "00000000";
 signal 	Data_out:	STD_LOGIC_Vector(7 downto 0) := "00000000";
 signal data_present : STD_LOGIC := '0';
+signal Data_sent : STD_LOGIC := '0';
 
 signal period : time := 10ns;
 begin
@@ -32,6 +34,7 @@ uut : Queue PORT MAP(
         Write => Write,
         Data_in => Data_in,
 		Data_out => Data_out,
+		Data_sent => Data_sent,
         data_present => data_present);
     
     
@@ -69,7 +72,7 @@ begin
     
     read <= '1';
     
-    wait for 2*period; -- Should read  (should become empty too)
+    wait for 1*period; -- Should read  (should become empty too)
     read <= '0';
     
     wait for 3*period;
@@ -85,7 +88,7 @@ begin
     
     read <= '1';
     
-    wait for 3*period; -- Attempt to read more than what is in the queue
+    wait for 1*period; -- Attempt to read more than what is in the queue
     read <= '0';
 	
     wait;

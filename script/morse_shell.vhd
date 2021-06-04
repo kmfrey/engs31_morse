@@ -1,21 +1,21 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
+-- Company:
+-- Engineer:
+--
 -- Create Date: 06/03/2021 10:13:51 PM
--- Design Name: 
+-- Design Name:
 -- Module Name: morse_shell - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
+-- Project Name:
+-- Target Devices:
+-- Tool Versions:
+-- Description:
+--
+-- Dependencies:
+--
 -- Revision:
 -- Revision 0.01 - File Created
 -- Additional Comments:
--- 
+--
 ----------------------------------------------------------------------------------
 
 
@@ -35,7 +35,7 @@ end morse_shell;
 architecture Behavioral of morse_shell is
 
 -- SCI receiver
-component SCI_receiver is 
+component SCI_receiver is
 PORT (
 	sclk : in std_logic;
     data_in : in std_logic;
@@ -55,17 +55,17 @@ PORT ( 	clk		:	in	STD_LOGIC; --10 MHz clock
 end component;
 
 -- look up table for ascii->morse encoding
-component morse_LUT is 
+component morse_LUT is
     port ( clk : in STD_LOGIC;
            addr : in STD_LOGIC_VECTOR (7 downto 0);
            output : out STD_LOGIC_VECTOR (7 downto 0));
 end component;
 
 -- controller & datapath
-component morse_sequencer is 
+component morse_sequencer is
     port ( clk : in STD_LOGIC;
            morse_in : in STD_LOGIC_VECTOR (7 downto 0);
-           queue_sent : in STD_LOGIC; 
+           queue_sent : in STD_LOGIC;
            signal_out : out STD_LOGIC_VECTOR (1 downto 0);
            signal_sent : out STD_LOGIC;
            ready : out STD_LOGIC);
@@ -86,15 +86,15 @@ component morse_output is
            wave_signal : in STD_LOGIC;
            led : out STD_LOGIC;
            sound : out STD_LOGIC);
-end component; 
+end component;
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 --Timing Signals:
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Signals for the clock divider, which divides the master clock down to 10MHz
 -- Master clock frequency / CLOCK_DIVIDER_VALUE = 20 MHz
-constant clk10MHz_tc: integer := 5; 
---constant clk10Hz_tc: integer := 10; 
+constant clk10MHz_tc: integer := 5;
+--constant clk10Hz_tc: integer := 10;
 signal clk10MHz_count: unsigned(3 downto 0) := (others => '0');    -- clock divider counter
 signal clk10MHz_tog: std_logic := '0';                        -- terminal count
 signal clk: std_logic := '0';
@@ -129,7 +129,7 @@ clock_buffer_10MHz: BUFG
 clock10MHz_divider: process(mclk)
 begin
 	if rising_edge(mclk) then
-	   	if clk10MHz_count = clk10MHz_tc-1 then 
+	   	if clk10MHz_count = clk10MHz_tc-1 then
 	   		clk10MHz_tog <= NOT(clk10MHz_tog);       -- Toggle flip flop
 			clk10MHz_count <= (others => '0');
 		else
@@ -146,7 +146,7 @@ sci_rec : SCI_receiver
                 data_in => data_in,
                 data_out => ascii_enqueue,
                 data_ready => write);
-                
+
 ascii_queue : Queue
     port map( clk => clk,
               Write => write,
@@ -160,7 +160,7 @@ lut : morse_LUT
     port map( clk => clk,
               addr => ascii_dequeued,
               output => encoded_morse);
-              
+
 sequencer: morse_sequencer
     port map( clk => clk,
               morse_in => encoded_morse,
@@ -168,11 +168,11 @@ sequencer: morse_sequencer
               signal_out => output_signal,
               signal_sent => signal_sent,
               ready => ready_for_new_char);
-              
+
  sound_generator: sound_wave
     port map ( sclk => clk,
                wave_signal => wave);
- 
+
  outputter: morse_output
     port map ( mclk => clk,
                signal_in => output_signal,
@@ -180,7 +180,7 @@ sequencer: morse_sequencer
                wave_signal => wave,
                led => led,
                sound => beep);
-         
+
 -- monopulse for read (based on whether there is something in queue or not)
 pop : process(clk)
 begin
@@ -192,10 +192,10 @@ begin
                 read_char <= '1';
                 read_mono <= '1'; -- monopulse
             end if;
-        else 
+        else
             read_mono <= '0'; -- reset the monopulse
         end if;
     end if;
 end process pop;
-              
+
 end Behavioral;
