@@ -110,6 +110,7 @@ baud_count_clr <= '1';
 bit_count_en <= '0';
 bit_count_clr <= '1';
 shift_en <= '0';
+d_ready <= '0'; -- monopulse
 
 
 case curr_state is
@@ -123,7 +124,7 @@ case curr_state is
         baud_count_clr <= '0';
         bit_count_en <= '0';
         bit_count_clr <= '0';
-        d_ready <= '0';  -- Keep data ready bit on till we detect a new set of bits
+--        d_ready <= '0';  -- Keep data ready bit on till we detect a new set of bits
         
         if baud_count = (N/2) - 1 then 
         	next_state <= bit_shift;
