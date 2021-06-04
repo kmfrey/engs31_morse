@@ -47,8 +47,7 @@ architecture behaviour of SCI_receiver is
 signal baud_count_en : std_logic := '0';
 signal baud_count_clr : std_logic := '0';
 signal baud_count : integer := 0;
-constant baud_rate : integer := 9600; -- Change later
-constant clk_freq : integer := 10000000; -- Change later
+constant baud_rate : integer := 9600;
 constant N : integer := 1042;
 
 --constant BAUD_PERIOD : integer := 391; 

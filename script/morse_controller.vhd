@@ -36,7 +36,6 @@ entity morse_sequencer is
            morse_in : in STD_LOGIC_VECTOR (7 downto 0);
            queue_sent : in STD_LOGIC;
            signal_out : out STD_LOGIC_VECTOR (1 downto 0);
-           signal_sent : out STD_LOGIC;
            ready : out STD_LOGIC);
 end morse_sequencer;
 
@@ -52,7 +51,7 @@ signal assign_output, clear_output : STD_LOGIC := '0';
 signal output_bits : STD_LOGIC_VECTOR(1 downto 0) := "00"; -- assigned during read phase
 
 -- for timing
-constant counter_time : integer := 5e6; -- 2Hz "clock", since clk is 10MHZ. 0.5s for each dot-time
+constant counter_time : integer := 5e3; --5e6; -- 2Hz "clock", since clk is 10MHZ. 0.5s for each dot-time
 signal timer_counter : unsigned(22 downto 0) := (others => '0');
 signal timer_tc : STD_LOGIC := '0';
 
@@ -107,7 +106,6 @@ begin
     space_count <= '0';
     pause_count <= '0';
     clear_output <= '0';
-    signal_sent <= '0';
     ns <= cs;
     
     case (cs) is
@@ -121,7 +119,6 @@ begin
             ns <= analyze;
             assign_output <= '1';
         when analyze =>
-            signal_sent <= '1';
             if signal_type = "001" then
                 ns <= dot_pause;
             elsif signal_type = "010" then
@@ -189,6 +186,7 @@ begin
                     counter <= "000";
                 end if;
             elsif pause_count = '1' then
+                counter <= counter + 1;
              -- take into account the 2 clk cycle delay, so do 2 cycles instead of 3
                 if counter = "010" then
                     tc <= '1';

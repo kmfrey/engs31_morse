@@ -67,26 +67,8 @@ component morse_sequencer is
            morse_in : in STD_LOGIC_VECTOR (7 downto 0);
            queue_sent : in STD_LOGIC; 
            signal_out : out STD_LOGIC_VECTOR (1 downto 0);
-           signal_sent : out STD_LOGIC;
            ready : out STD_LOGIC);
-
 end component;
-
--- clock divider
-component sound_wave is
-    port ( sclk : in STD_LOGIC;
-           wave_signal : out STD_LOGIC);
-end component;
-
--- sound & led output
-component morse_output is
-    port ( mclk : in STD_LOGIC;
-           signal_in : in STD_LOGIC_VECTOR (1 downto 0);
-           new_signal : in STD_LOGIC;
-           wave_signal : in STD_LOGIC;
-           led : out STD_LOGIC;
-           sound : out STD_LOGIC);
-end component; 
 
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 --Timing Signals:
@@ -105,14 +87,11 @@ signal write : STD_LOGIC := '0'; -- SCI to queue
 signal ascii_dequeued : STD_LOGIC_VECTOR(7 downto 0) := (others => '0'); -- queue to LUT
 signal encoded_morse : STD_LOGIC_VECTOR(7 downto 0) := (others => '0'); -- LUT to sequencer
 signal sent_new_char : STD_LOGIC := '0'; -- queue to sequencer
-signal ready_for_new_char : STD_LOGIC := '0'; -- sequencer to queue
-signal output_signal : STD_LOGIC_VECTOR := "00"; -- sequencer to output
-signal signal_sent : STD_LOGIC := '0';
+signal ready_for_new_char : STD_LOGIC := '0'; -- sequencer to queue & output
+signal output_signal : STD_LOGIC_VECTOR(1 downto 0) := "00"; -- sequencer to output
 signal not_empty : STD_LOGIC := '0';
 signal read_char : STD_LOGIC := '0'; -- monopulsed ready
 signal read_mono : STD_LOGIC := '0'; -- to keep track of monopulse
-signal wave : STD_LOGIC := '0'; -- soundwave to output
-
 
 begin
 
@@ -166,33 +145,22 @@ sequencer: morse_sequencer
               morse_in => encoded_morse,
               queue_sent => sent_new_char,
               signal_out => output_signal,
-              signal_sent => signal_sent,
               ready => ready_for_new_char);
-              
- sound_generator: sound_wave
-    port map ( sclk => clk,
-               wave_signal => wave);
- 
- outputter: morse_output
-    port map ( mclk => clk,
-               signal_in => output_signal,
-               new_signal => signal_sent,
-               wave_signal => wave,
-               led => led,
-               sound => beep);
          
 -- monopulse for read (based on whether there is something in queue or not)
-pop : process(mclk)
+pop : process(clk)
 begin
-    read_char <= '0'; -- default
-    if ready_for_new_char = '1' then
-        -- only go high if there is something to read, otherwise keep tryng
-        if read_mono = '0' and not_empty = '1' then
-            read_char <= '1';
-            read_mono <= '1'; -- monopulse
+    if rising_edge(clk) then 
+        read_char <= '0'; -- default
+        if ready_for_new_char = '1' then
+            -- only go high if there is something to read, otherwise keep tryng
+            if read_mono = '0' and not_empty = '1' then
+                read_char <= '1';
+                read_mono <= '1'; -- monopulse
+            end if;
+        else 
+            read_mono <= '0'; -- reset the monopulse
         end if;
-    else 
-        read_mono <= '0'; -- reset the monopulse
     end if;
 end process pop;
               
