@@ -52,7 +52,7 @@ signal assign_output, clear_output : STD_LOGIC := '0';
 signal output_bits : STD_LOGIC_VECTOR(1 downto 0) := "00"; -- assigned during read phase
 
 -- for timing
-constant counter_time : integer := 5e3; --5e6; -- 2Hz "clock", since clk is 10MHZ. 0.5s for each dot-time
+constant counter_time : integer := 5e6; -- 2Hz "clock", since clk is 10MHZ. 0.5s for each dot-time
 signal timer_counter : unsigned(22 downto 0) := (others => '0');
 signal timer_tc : STD_LOGIC := '0';
 
@@ -97,7 +97,7 @@ begin
     
 end process update_state;
 
-next_state : process(cs, new_data, signal_type, tc)
+next_state : process(cs, new_data, letter_done, signal_type, tc)
 begin
     -- default signals
     ready <= '0';
@@ -137,7 +137,7 @@ begin
             if tc = '1' then
                 ns <= read; -- default
                 if letter_done = '1' then
-                    ns <= await;
+                    ns <= letter_end;
                 end if;
             end if;
         when dash_pause =>
@@ -145,7 +145,7 @@ begin
             if tc = '1' then
                 ns <= read; -- default
                 if letter_done = '1' then
-                    ns <= await;
+                    ns <= letter_end;
                 end if; 
             end if;
         when letter_end =>

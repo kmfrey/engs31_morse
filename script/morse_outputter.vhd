@@ -91,7 +91,9 @@ begin
                 curr_out <= '1';
                 sound_out <= wave_signal;
             end if;
-        when others => curr_out <= '0';
+        when others => 
+            curr_out <= '0';
+            sound_out <= '0';
         
     end case;
 end process output;

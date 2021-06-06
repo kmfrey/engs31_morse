@@ -106,7 +106,7 @@ signal ascii_dequeued : STD_LOGIC_VECTOR(7 downto 0) := (others => '0'); -- queu
 signal encoded_morse : STD_LOGIC_VECTOR(7 downto 0) := (others => '0'); -- LUT to sequencer
 signal sent_new_char : STD_LOGIC := '0'; -- queue to sequencer
 signal ready_for_new_char : STD_LOGIC := '0'; -- sequencer to queue
-signal output_signal : STD_LOGIC_VECTOR := "00"; -- sequencer to output
+signal output_signal : STD_LOGIC_VECTOR(1 downto 0) := "00"; -- sequencer to output
 signal signal_sent : STD_LOGIC := '0';
 signal not_empty : STD_LOGIC := '0';
 signal read_char : STD_LOGIC := '0'; -- monopulsed ready

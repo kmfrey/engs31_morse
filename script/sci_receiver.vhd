@@ -48,12 +48,12 @@ signal baud_count_en : std_logic := '0';
 signal baud_count_clr : std_logic := '0';
 signal baud_count : integer := 0;
 constant baud_rate : integer := 9600;
-constant N : integer := 1042;
 
---constant BAUD_PERIOD : integer := 391; 
 --Number of clock cycles needed to achieve a 
 --baud rate of 9600 given a 10 MHz clock 
 --(10 MHz / 9600 = 1042)
+constant N : integer := 1042; -- Baud period
+
 
 -- Bits Counter Signals
 signal bit_count_en : std_logic := '0';
@@ -74,8 +74,12 @@ begin
 
 stateAndCounterUpdate : process (sclk)
 begin
-	
+
     if rising_edge(sclk) then
+    
+        -- Current State 
+        curr_state <= next_state;
+        
     	-- Update Baud Counter
         if baud_count_en = '1' then	
         	baud_count <= baud_count + 1;
@@ -94,9 +98,13 @@ begin
         if shift_en = '1' then
         	data <= data_in & data(9 downto 1); -- LSB is clocked in first. Use left shi
         end if;
-        -- Current State 
-        curr_state <= next_state;
-      
+        
+        -- Output Update
+        if d_ready = '1' then
+	       data_out <= std_logic_vector(data(8 downto 1));
+        -- Discard first and last bits
+        end if;
+        
     end if;
 end process stateAndCounterUpdate;
 
@@ -110,7 +118,7 @@ bit_count_en <= '0';
 bit_count_clr <= '1';
 shift_en <= '0';
 d_ready <= '0'; -- monopulse
-
+next_state <= curr_state;
 
 case curr_state is
 	when idle =>	
@@ -157,15 +165,6 @@ case curr_state is
         next_state <= idle;
 end case;
 end process nextStateLogic;
-
-outputUpdate : process(d_ready)
-begin
-
-if d_ready = '1' then
-	data_out <= std_logic_vector(data(8 downto 1));
-    -- Discard first and last bits
-end if;
-end process outputUpdate;
 
 data_ready <= d_ready;
 

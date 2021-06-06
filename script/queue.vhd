@@ -42,13 +42,15 @@ begin
             end if;
         end if;
         
-        if (read = '1') and (not (W_ADDR = R_ADDR)) then -- Only update r_addr counter when read signal is asserted and queue is not empty
-        	Data_out <= Queue_reg(R_ADDR); -- <= (others => '0'); Don't clear out the Queue. Only use 
-        	d_sent <= '1';
-        	if R_ADDR = (queue_size-1) then   --- R_ADDR Counter
-            	R_ADDR <= 0;
-      		else
-            	R_ADDR <= R_ADDR + 1;
+        if (read = '1') then --and (not (W_ADDR = R_ADDR)) then -- Only update r_addr counter when read signal is asserted and queue is not empty
+        	if (W_ADDR /= R_ADDR) then 
+                Data_out <= Queue_reg(R_ADDR); -- <= (others => '0'); Don't clear out the Queue.
+                d_sent <= '1';
+                if R_ADDR = (queue_size-1) then   --- R_ADDR Counter
+                    R_ADDR <= 0;
+                else
+                    R_ADDR <= R_ADDR + 1;
+                end if;
             end if;
         end if;
         -- update data_sent after 2 full clock cycles
